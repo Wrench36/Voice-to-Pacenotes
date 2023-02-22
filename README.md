@@ -32,7 +32,7 @@ To set defaults:<br>
   
 If RBR isn't already running on a stage, you'll see the message "no telemetry" printed.<br>
 If you see this while RBR is running on a stage, verify telemetry is on and ports are set properly.<br>
-If it still doesn't work, ¯"\"_(ツ)_/¯<br>
+If it still doesn't work, ¯\_(ツ)_/¯<br>
 Start your recce run as normal
 
 Writing notes:<br>
