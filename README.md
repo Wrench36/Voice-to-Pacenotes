@@ -6,7 +6,7 @@ Please see the PDF at https://github.com/Wrench36/Voice-to-Pacenotes/blob/main/V
 The Short version:
 Voice to pacenotes is a python script that uses your RBR pacenotes plugin instal to determine the internal IDs of pacenotes, and then uses that information to write valid pacenote files using google speech recognition.
 
-Python requirements
+Python requirements:
 See requirements.txt for a list of requirements.
 Install requirements using the batch file "install requirements.bat" provided, or the 
 command "pip install -r requirements.txt"
