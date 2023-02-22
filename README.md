@@ -3,7 +3,7 @@ Create pacenotes for RBR with voice commands.
 
 Please see the PDF at https://github.com/Wrench36/Voice-to-Pacenotes/blob/main/Voice%20to%20Pacenotes%20Documentation.pdf for more information.
 
-The Short version:
+The Short version:<br>
 Voice to pacenotes is a python script that uses your RBR pacenotes plugin instal to determine the internal IDs of pacenotes, and then uses that information to write valid pacenote files using google speech recognition.
 
 Python requirements:
