@@ -237,8 +237,8 @@ def loop():
                 if exportJB == "y":
                         print(str(event.button))
                 if event.button == btnNum:
-                    #progress = round(struct.unpack_from('<f', tele , offset=16)[0],1)
-                    progress = 30
+                    progress = round(struct.unpack_from('<f', tele , offset=16)[0],1)
+                    #progress = 30
                     note = speechRec()
                     if note:
                         print("note = " + note)
