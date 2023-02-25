@@ -12,10 +12,10 @@ Install requirements using the batch file "install requirements.bat" provided, o
 
 Pacenotes plugin config:<br>
 Included is a pacenotes mod to make this easier, but some may not want to use it (numeric swapped)<br>
-If you don't want to use it, go to "Advanced configuration" below.
+If you don't want to use it, go to "Advanced configuration" in the PDF.
 
 RBR config:<br>
-In RSF the launcher, set the UDP telemetry on, and port to 6776. You can edit the port below if needed for some reason.
+In RSF the launcher, set the UDP telemetry on, and port to 6776.
 
 Script Config:<br>
 Open iniInterpret.py and edit the RBR install directory in line 6 to match yours.<br>
