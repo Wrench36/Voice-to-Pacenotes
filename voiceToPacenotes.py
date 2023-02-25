@@ -14,6 +14,7 @@ VERION 0.2
 import socket
 import struct
 import os
+import sys
 import keyboard
 import pygame
 import speech_recognition as sr
@@ -23,6 +24,17 @@ from tkinter import filedialog
 import operator
 import winsound
 import time
+global debug
+debug = False
+
+n = len(sys.argv)
+for i in range(1, n):
+    print(sys.argv[i], end = "\n")
+    if sys.argv[i] == "debug":
+        debug = True
+if debug:
+    print("DEBUG MODE!")
+
 
 pygame.init()
 
@@ -129,7 +141,7 @@ def handleSpecialCase(case,totalNotesTab):
     thisFlag = specialCases[case]
     totalNotesTab[len(totalNotesTab)-1]['flag'] = thisFlag
 
-def speechRec():   
+def speechRecHold(editBool):   
     print("listening")
     try:
         # use the microphone as source for input.
@@ -145,24 +157,8 @@ def speechRec():
             # Using google to recognize audio
             try:
                 MyText = r.recognize_google(audio2)
-                
-                MyText = MyText.replace("1", "one")
-                MyText = MyText.replace("2", "two")
-                MyText = MyText.replace("too", "two")
-                MyText = MyText.replace(" to", " two")
-                MyText = MyText.replace("3", "three")
-                MyText = MyText.replace("4", "four")
-                MyText = MyText.replace("for", "four")
-                MyText = MyText.replace("5", "five")
-                MyText = MyText.replace("6", "six")
-                MyText = MyText.replace("write", "right")
-                MyText = MyText.replace("intwo", "into")
-                MyText = MyText.replace("break", "brake")
-                MyText = MyText.replace("Titans", "TIGHTENS")
-                MyText = MyText.replace("BRAKEING", "BRAKING")
-                MyText = MyText.replace("TWO SITE DISTANCE", "TO SIGHT DISTANCE")
-                MyText = MyText.replace("'", "")
-                MyText = MyText.upper()
+                if editBool:
+                    MyText = editSpeech(MyText)
                 return MyText
 
             except sr.RequestError as e:
@@ -173,16 +169,47 @@ def speechRec():
     except:
         return False
 
-def basicSpeechRec():
+def speechRec(editBool):
+    print("listening")
     try:
+        # use the microphone as source for input.
         with sr.Microphone() as source2:
+            #r.adjust_for_ambient_noise(source2, duration=0.2)
             audio2 = r.listen(source2)
-            MyText = r.recognize_google(audio2)
-            return MyText
-    except sr.RequestError as e:
-        print("Could not request results; {0}".format(e))
-    except sr.UnknownValueError:
-        print("unknown error occurred")
+            # Using google to recognize audio
+            try:
+                MyText = r.recognize_google(audio2)
+                if editBool:
+                    MyText = editSpeech(MyText)
+                return MyText
+
+            except sr.RequestError as e:
+                print("Could not request results; {0}".format(e))
+                
+            except sr.UnknownValueError:
+                print("unknown error occurred")
+    except:
+        return False
+
+def editSpeech(MyText):
+    MyText = MyText.replace("1", "one")
+    MyText = MyText.replace("2", "two")
+    MyText = MyText.replace("too", "two")
+    MyText = MyText.replace(" to", " two")
+    MyText = MyText.replace("3", "three")
+    MyText = MyText.replace("4", "four")
+    MyText = MyText.replace("for", "four")
+    MyText = MyText.replace("5", "five")
+    MyText = MyText.replace("6", "six")
+    MyText = MyText.replace("write", "right")
+    MyText = MyText.replace("intwo", "into")
+    MyText = MyText.replace("break", "brake")
+    MyText = MyText.replace("Titans", "TIGHTENS")
+    MyText = MyText.replace("BRAKEING", "BRAKING")
+    MyText = MyText.replace("TWO SITE DISTANCE", "TO SIGHT DISTANCE")
+    MyText = MyText.replace("'", "")
+    MyText = MyText.upper()
+    return MyText
 
 def getBaseNotes(filename):
     totalNotesTab = []
@@ -237,9 +264,22 @@ def loop():
                 if exportJB == "y":
                         print(str(event.button))
                 if event.button == btnNum:
-                    progress = round(struct.unpack_from('<f', tele , offset=16)[0],1)
-                    #progress = 30
-                    note = speechRec()
+                    if debug:
+                        progress = 30
+                        print("debug means all notes are at 30m")
+                    else:
+                        try:
+                            progress = round(struct.unpack_from('<f', tele , offset=16)[0],1)
+                        except Exception as e:
+                            if not 'tele' in locals():
+                                print("not receiving telemetry")
+                                SpeakText("not receiving telemetry")
+                            else:
+                                print(e)
+                                SpeakText(e)
+                            continue
+                    
+                    note = speechRecHold(True)
                     if note:
                         print("note = " + note)
                     if note == "EDIT LAST":
@@ -250,6 +290,10 @@ def loop():
                         continue
                     if note == "MOVE LAST":
                         rawStringsTab = moveLast(rawStringsTab) or rawStringsTab
+                        continue
+                    if note == "MOVE NEAREST":
+                        rawStringsTab = moveNearest(progress,rawStringsTab) or rawStringsTab
+                        continue
                     pacenoteIds = checkDict(note)
                     print(pacenoteIds)
                     if pacenoteIds:
@@ -263,7 +307,7 @@ def loop():
 
 def editLast(rawStringsTab):
     SpeakText("edit Last")
-    note = speechRec()
+    note = speechRec(True)
     if note == "CANCEL":
         SpeakText("cancel")
         return False
@@ -281,7 +325,7 @@ def editNearest(progress,rawStringsTab):
     SpeakText("Edit Nearest")
     idx = find_nearest(rawStringsTab, progress)
     SpeakText(rawStringsTab[idx]["string"])
-    note = speechRec()
+    note = speechRec(True)
     if note == "CANCEL":
         SpeakText("cancel")
         return False
@@ -296,8 +340,10 @@ def editNearest(progress,rawStringsTab):
         return False
 
 def moveLast(rawStringsTab):
-    SpeakText("move Last")
-    delta = basicSpeechRec()
+    target = "%s at %i" % (rawStringsTab[len(rawStringsTab)-1]["string"],rawStringsTab[len(rawStringsTab)-1]["progress"])
+    print(target)
+    SpeakText(target)
+    delta = speechRec(False)
     if delta == "CANCEL":
         SpeakText("cancel")
         return False
@@ -308,17 +354,22 @@ def moveLast(rawStringsTab):
         delta = float(delta)
         progress = rawStringsTab[len(rawStringsTab)-1]["progress"]
         rawStringsTab[len(rawStringsTab)-1]["progress"] = progress + delta
-        SpeakText("%s moved from %i to %i" % (rawStringsTab[len(rawStringsTab)-1]["string"],progress,rawStringsTab[len(rawStringsTab)-1]["progress"]))
+        confirmation = "%s moved from %i to %i" % (rawStringsTab[len(rawStringsTab)-1]["string"],progress,rawStringsTab[len(rawStringsTab)-1]["progress"])
+        print(confirmation)
+        SpeakText(confirmation)
         return rawStringsTab
     except Exception as e:
+        print(e)
         SpeakText(e)
         return False
 
 def moveNearest(progress,rawStringsTab):
     SpeakText("Move Nearest")
     idx = find_nearest(rawStringsTab, progress)
-    SpeakText("%s at %s" % (rawStringsTab[idx]["string"],rawStringsTab[idx]["progress"]))
-    delta = basicSpeechRec()
+    target = "%s at %i" % (rawStringsTab[idx]["string"],rawStringsTab[idx]["progress"])
+    print(target)
+    SpeakText(target)
+    delta = speechRec(False)
     if delta == "CANCEL":
         SpeakText("cancel")
         return False
