@@ -72,7 +72,7 @@ See the included PDF. This will also be updated as the script is updated.<br>
 -Using languages other than English<br>
   -This is theoretically possible, see the pdf.
   
-If you run into problems, or if I forgot anything here, join the support discord at https://discord.gg/Mqk53VRj
+If you run into problems, or if I forgot anything here, let me know on the RSF discord.
 
 
 
