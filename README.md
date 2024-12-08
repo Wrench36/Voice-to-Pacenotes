@@ -7,7 +7,7 @@ The Short version:<br>
 Voice to pacenotes is a python script that uses your RBR pacenotes plugin install to determine the internal IDs of pacenotes, and then uses that information to write valid pacenote files using google speech recognition.
 Have a look at the PDF file so I don't have to copy and reformat it here.
 
-v0.3.0A:
+v0.3.0A:<br>
 Almost completley rewritten.
 When starting VTP, you will need to specify your 'packages' file, that's the file in plugins/pacenote/config/pacenotes/packages and should be an ini.
 Once this is done VTP will store a json file to remember the settings.
